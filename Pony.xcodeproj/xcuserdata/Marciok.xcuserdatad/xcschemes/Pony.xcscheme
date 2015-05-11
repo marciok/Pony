@@ -51,6 +51,14 @@
                BlueprintName = "PonyTests"
                ReferencedContainer = "container:Pony.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "AppIntroViewControllerSpec">
+               </Test>
+               <Test
+                  Identifier = "BreedsTableViewControllerSpec">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
       <MacroExpansion>

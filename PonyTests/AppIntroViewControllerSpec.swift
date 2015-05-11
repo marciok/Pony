@@ -38,9 +38,9 @@ class AppIntroViewControllerSpec: QuickSpec {
           
           userDefaults.setBool(false, forKey: "appIntroHasBeenPresented")
           
-          viewController.dismissButtonTapHandler = {
-            tapHandlerTriggered = true
-          }
+//          viewController.dismissButtonTapHandler = {
+//            tapHandlerTriggered = true
+//          }
           
           viewController.dismissButton!.sendActionsForControlEvents(UIControlEvents.TouchUpInside)
         }

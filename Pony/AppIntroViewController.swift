@@ -8,15 +8,20 @@
 
 import UIKit
 
+@objc public protocol AppIntroDelegate {
+  
+  func appIntroDidFinish(appIntro: UIViewController!)
+}
+
 public class AppIntroViewController: UIViewController {
     
     public var dismissButton: UIButton?
-    public var dismissButtonTapHandler: (() -> Void)?
-    
+    weak public var delegate: AnyObject?
+  
     @IBAction public func dismissButtonTapped() {
         
-    if let dismissButtonTapHandler = self.dismissButtonTapHandler {
-      dismissButtonTapHandler()
+    if let delegate = self.delegate as? AppIntroDelegate  {
+      delegate.appIntroDidFinish(self)
     }
   }
 }

@@ -8,60 +8,58 @@ class PonyTabBarControllerSpec: QuickSpec {
     
     describe(".viewDidAppear"){
       
-      context("when app intro had not been presented"){
+      context("When app intro had never been dismissed"){
         
-        beforeEach {
-          // Arrange:
-          NSUserDefaults.standardUserDefaults().setBool(false, forKey: "appIntroHasBeenPresented")
-          let storyboard = UIStoryboard(name:"Main", bundle: NSBundle.mainBundle())
-          tabBarController = storyboard.instantiateInitialViewController() as! PonyTabController
-          
-          // Act:
-          UIApplication.sharedApplication().keyWindow?.rootViewController = tabBarController
+        var appIntroViewController: AppIntroViewController?
+        
+        beforeEach{
+            // Arrange:
+            NSUserDefaults.standardUserDefaults().setBool(false, forKey: "appIntroHasBeenPresented")
+            let storyboard = UIStoryboard(name:"Main", bundle: NSBundle.mainBundle())
+            tabBarController = storyboard.instantiateInitialViewController() as! PonyTabController
+            let window = UIWindow(frame: UIScreen.mainScreen().bounds)
+            window.makeKeyAndVisible()
+            window.rootViewController = tabBarController
+            
+            // Act:
+            tabBarController.beginAppearanceTransition(true, animated: false) // Triggers viewWillAppear
+            tabBarController.endAppearanceTransition() // Triggers viewDidAppear
+            
+            appIntroViewController = tabBarController.presentedViewController as! AppIntroViewController!
+        }
+        
+        it("should set the appIntroDelegate"){
+            // Assert:
+            expect(appIntroViewController!.delegate as? PonyTabController).to(equal(tabBarController))
         }
         
         it("should be presented"){
           // Assert:
-          expect(tabBarController.presentedViewController).toEventually(beAnInstanceOf(AppIntroViewController))
+          expect(tabBarController.presentedViewController)
+            .toEventually(beAnInstanceOf(AppIntroViewController))
         }
         
-        context("and dissmiss button was tapped") {
+        context("and appIntroDidFinish is called") {
           
           let userDefaults = NSUserDefaults.standardUserDefaults()
-          var appIntroViewController: AppIntroViewController?
           
           beforeEach {
             // Arrange:
             userDefaults.setBool(false, forKey: "appIntroHasBeenPresented")
             
-            waitUntil { done in
-                NSThread.sleepForTimeInterval(0.5)
-                done()
-            }
-           
             // Act:
-            tabBarController.viewDidAppear(false)
-            
-            waitUntil { done in
-                NSThread.sleepForTimeInterval(0.5)
-                done()
-            }
-            
-            var appIntroViewController = tabBarController.presentedViewController as! AppIntroViewController
-            appIntroViewController.dismissButton!.sendActionsForControlEvents(UIControlEvents.TouchUpInside)
+            // Triggers viewWillAppear and viewDidAppear:animated
+            tabBarController.beginAppearanceTransition(true, animated: false)
+            tabBarController.endAppearanceTransition()
+
+            // - Dismissing app intro.
+            tabBarController.appIntroDidFinish(appIntroViewController)
           }
           
-          it("should set appIntroHasBeenPresented to true"){
+          it("should be set as the appIntroDelegate"){
             // Assert:
-            expect(userDefaults.boolForKey("appIntroHasBeenPresented")).to(beTrue())
+            expect(appIntroViewController!.isBeingDismissed()).toEventually(beTrue())
           }
-          
-          it("should dismiss app intro"){
-            // Assert:
-            expect(tabBarController.presentedViewController
-                ).toEventually(beNil())
-          }
-            
         }
       }
     }

@@ -10,7 +10,7 @@ import UIKit
 
 public class PonyTabController: UITabBarController {
   
-  public override func viewDidAppear(animated: Bool) {
+  override public func viewDidAppear(animated: Bool) {
     super.viewDidAppear(animated)
     
     let userDefaults = NSUserDefaults.standardUserDefaults()
@@ -18,14 +18,24 @@ public class PonyTabController: UITabBarController {
     if !userDefaults.boolForKey("appIntroHasBeenPresented") {
       let storyboard = UIStoryboard(name: "Main", bundle: NSBundle.mainBundle())
       let appIntroViewController = storyboard.instantiateViewControllerWithIdentifier("appIntroViewControllerID") as! AppIntroViewController
+        
+      appIntroViewController.delegate = self
       
       self.presentViewController(appIntroViewController, animated: true) {
-        
-        appIntroViewController.dismissButtonTapHandler = {
-          userDefaults.setBool(true, forKey: "appIntroHasBeenPresented")
-          self.dismissViewControllerAnimated(true, completion:nil)
-        }
+        userDefaults.setBool(true, forKey: "appIntroHasBeenPresented")
       }
     }
+  }
+  
+}
+
+
+extension PonyTabController: AppIntroDelegate {
+    
+// MARK: - AppIntroDelegate
+    
+  public func appIntroDidFinish(appIntro: UIViewController!) {
+    // Dismissing app intro
+    dismissViewControllerAnimated(true, completion:nil)
   }
 }
